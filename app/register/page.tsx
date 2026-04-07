@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Link from "next/link";
 import { useNotification } from "../components/Notification";
-import { Mail, Lock, User, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");

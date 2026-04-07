@@ -4,7 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 // import { IKUploadResponse } from "imagekitio-next"; // Try this if path is wrong
-type IKUploadResponse = any; 
+interface IKUploadResponse {
+  fileId: string;
+  url: string;
+  filePath: string;
+  thumbnailUrl?: string;
+}
 import FileUpload from "./FileUpload";
 import { apiClient } from "@/lib/api-client";
 import { useNotification } from "./Notification";

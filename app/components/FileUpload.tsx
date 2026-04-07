@@ -5,8 +5,15 @@ import { useState } from "react";
 import { useNotification } from "./Notification";
 import { AlertCircle, Loader2 } from "lucide-react";
 
+interface IKUploadResponse {
+  fileId: string;
+  url: string;
+  filePath: string;
+  thumbnailUrl?: string;
+}
+
 interface FileUploadProps {
-  onSuccess: (res: any) => void;
+  onSuccess: (res: IKUploadResponse) => void;
   onProgress?: (progress: number) => void;
   fileType?: "image" | "video";
 }
@@ -16,7 +23,7 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
 
-  const onError = (err: any) => {
+  const onError = (err: { message: string }) => {
     console.error("Upload Error:", err);
     const msg = err?.message || "Upload failed. Please check your keys.";
     setError(msg);
@@ -24,7 +31,7 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
     setUploading(false);
   };
 
-  const handleSuccess = (res: any) => {
+  const handleSuccess = (res: IKUploadResponse) => {
     setUploading(false);
     setError(null);
     onSuccess(res);
@@ -36,7 +43,7 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
     setError(null);
   };
 
-  const handleProgress = (event: any) => {
+  const handleProgress = (event: { loaded: number; total: number }) => {
     if (onProgress && event.loaded && event.total) {
       const percent = Math.round((event.loaded / event.total) * 100);
       onProgress(percent);

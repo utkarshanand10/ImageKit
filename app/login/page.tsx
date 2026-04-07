@@ -30,7 +30,7 @@ export default function LoginPage() {
         showNotification("Logged in successfully!", "success");
         router.push("/");
       }
-    } catch (error) {
+    } catch {
       showNotification("An unexpected error occurred", "error");
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export default function LoginPage() {
               Welcome Back
             </h1>
             <p className="text-base-content/60 font-medium">
-              Ready to explore more reels? Let's get you in.
+              Ready to explore more reels? Let&apos;s get you in.
             </p>
           </div>
 

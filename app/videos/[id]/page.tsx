@@ -44,7 +44,7 @@ export default async function VideoPage({
               <div className="flex items-center gap-3 mb-4">
                 <span className="badge badge-primary font-black uppercase tracking-widest text-[10px] py-3">REEL</span>
                 <span className="text-base-content/40 text-xs font-bold uppercase tracking-widest">
-                  {new Date((video as any).createdAt).toLocaleDateString()}
+                  {video.createdAt ? new Date(video.createdAt).toLocaleDateString() : "Unknown date"}
                 </span>
               </div>
               
