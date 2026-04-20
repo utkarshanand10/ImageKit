@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-// import { IKUploadResponse } from "imagekitio-next"; // Try this if path is wrong
 interface IKUploadResponse {
-  fileId: string;
+  fileId?: string;
   url: string;
   filePath: string;
   thumbnailUrl?: string;

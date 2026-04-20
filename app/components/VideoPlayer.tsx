@@ -1,6 +1,6 @@
 "use client";
 
-import { IKVideo } from "imagekitio-next";
+import { Video } from "@imagekit/next";
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -9,8 +9,8 @@ interface VideoPlayerProps {
 
 export default function VideoPlayer({ videoUrl, controls = true }: VideoPlayerProps) {
   return (
-    <IKVideo
-      path={videoUrl}
+    <Video
+      src={videoUrl}
       transformation={[
         {
           height: "1920",

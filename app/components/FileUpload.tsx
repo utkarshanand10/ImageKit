@@ -1,12 +1,12 @@
 "use client";
 
-import { IKUpload } from "imagekitio-next";
+import { upload } from "@imagekit/next";
 import { useState } from "react";
 import { useNotification } from "./Notification";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 interface IKUploadResponse {
-  fileId: string;
+  fileId?: string;
   url: string;
   filePath: string;
   thumbnailUrl?: string;
@@ -22,6 +22,7 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showNotification } = useNotification();
+  const publicKey = process.env.NEXT_PUBLIC_PUBLIC_KEY;
 
   const onError = (err: { message: string }) => {
     console.error("Upload Error:", err);
@@ -43,7 +44,7 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
     setError(null);
   };
 
-  const handleProgress = (event: { loaded: number; total: number }) => {
+  const handleProgress = (event: ProgressEvent) => {
     if (onProgress && event.loaded && event.total) {
       const percent = Math.round((event.loaded / event.total) * 100);
       onProgress(percent);
@@ -68,23 +69,63 @@ const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
     }
   };
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!publicKey) {
+      onError({ message: "Missing NEXT_PUBLIC_PUBLIC_KEY" });
+      return;
+    }
+
+    const isValid = fileType === "video" ? file.type.startsWith("video/") : file.type.startsWith("image/");
+    if (!isValid) {
+      onError({ message: "Invalid file type" });
+      return;
+    }
+
+    try {
+      handleStart();
+      const { signature, token, expire } = await authenticator();
+
+      const res = await upload({
+        file,
+        fileName: file.name,
+        publicKey,
+        signature,
+        token,
+        expire,
+        folder: fileType === "video" ? "/videos" : "/images",
+        useUniqueFileName: true,
+        onProgress: handleProgress,
+      });
+
+      if (!res.url || !res.filePath) {
+        throw new Error("Upload response is missing required file details");
+      }
+
+      handleSuccess({
+        fileId: res.fileId,
+        url: res.url,
+        filePath: res.filePath,
+        thumbnailUrl: res.thumbnailUrl,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Upload failed. Please check your keys.";
+      onError({ message });
+    } finally {
+      event.target.value = "";
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <IKUpload
-        fileName={fileType === "video" ? "video.mp4" : "image.jpg"}
-        useUniqueFileName={true}
-        validateFile={(file) => {
-          const isValid = fileType === "video" ? file.type.startsWith("video/") : file.type.startsWith("image/");
-          if (!isValid) showNotification("Invalid file type", "error");
-          return isValid;
-        }}
-        onError={onError}
-        onSuccess={handleSuccess}
-        onUploadProgress={handleProgress}
-        onUploadStart={handleStart}
-        authenticator={authenticator}
+      <input
+        type="file"
+        accept={fileType === "video" ? "video/*" : "image/*"}
+        onChange={handleFileChange}
+        disabled={uploading}
         className="file-input file-input-bordered w-full bg-base-100/50 border-base-300 focus:border-primary transition-all cursor-pointer rounded-xl file:bg-primary file:text-primary-content file:border-none file:px-6 file:font-black file:uppercase file:text-xs file:tracking-widest file:hover:bg-primary/90 file:transition-all disabled:opacity-50"
-        folder={fileType === "video" ? "/videos" : "/images"}
       />
 
       {uploading && (

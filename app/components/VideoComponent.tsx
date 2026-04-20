@@ -1,5 +1,5 @@
 "use client";
-import { IKVideo } from "imagekitio-next";
+import { Video } from "@imagekit/next";
 import Link from "next/link";
 import { IVideo } from "@/models/Video";
 
@@ -12,8 +12,8 @@ export default function VideoComponent({ video }: { video: IVideo }) {
             className="rounded-2xl overflow-hidden relative w-full border border-base-content/5 shadow-sm"
             style={{ aspectRatio: "9/16" }}
           >
-            <IKVideo
-              path={video.videoUrl}
+            <Video
+              src={video.videoUrl}
               transformation={[
                 {
                   height: "1920",
